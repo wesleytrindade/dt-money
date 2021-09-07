@@ -1,8 +1,9 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState} from 'react';
 import Modal from 'react-modal';
 import closeImg from '../../assets/close.svg';
 import incomeImg from '../../assets/income.svg';
 import outcomeImg from '../../assets/outcome.svg';
+import { useTransactions } from '../../hooks/useTransactions';
 import { Container, TransactionTypeContainer,RadioBox } from './styles';
 
 interface TransactionModalProps {
@@ -11,19 +12,32 @@ interface TransactionModalProps {
 }
 export function TransactionModal({ isOpen, onRequestClose }: TransactionModalProps) {
     
+    const {createTransaction} = useTransactions();
+
     const [title,setTitle] = useState('');
-    const [value,setValue] = useState(0);
+    const [amount,setAmount] = useState(0);
     const [category,setCategory] = useState('');
     const [type,setType] = useState('deposit');
 
-    function handleCreateTransaction(event:FormEvent){
+    async function handleCreateTransaction(event:FormEvent){
         event.preventDefault();
-        console.log({
+
+        await createTransaction({
             title,
-            value,
+            amount,
             category,
             type
         });
+        clearState();
+        onRequestClose();
+        
+    }
+
+    function clearState(){
+        setCategory('');
+        setAmount(0);
+        setTitle('');
+        setType('deposit');
     }
     return (
         <Modal
@@ -38,7 +52,7 @@ export function TransactionModal({ isOpen, onRequestClose }: TransactionModalPro
                 onClick={onRequestClose}
                 className="react-modal-close"
             >
-                <img src={closeImg} />
+                <img src={closeImg} alt="img"/>
             </button>
 
             <Container onSubmit={handleCreateTransaction}>
@@ -51,9 +65,9 @@ export function TransactionModal({ isOpen, onRequestClose }: TransactionModalPro
                 />
 
                 <input type="number" 
-                value={value} 
+                value={amount} 
                 placeholder="Valor"
-                onChange={(event)=>setValue(Number(event.target.value))}
+                onChange={(event)=>setAmount(Number(event.target.value))}
                 min="0"
                 />
 
