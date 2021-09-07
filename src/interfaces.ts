@@ -7,3 +7,5 @@ export interface Transaction{
     createdAt:Date
 
 }
+
+export type TransactionInput = Omit<Transaction, 'id'|'createdAt'>;
